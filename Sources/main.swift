@@ -20,7 +20,7 @@
 import PerfectLib
 import PerfectHTTP
 import PerfectHTTPServer
-import Perfect_WebRedirects
+import PerfectWebRedirects
 import PerfectRequestLogger
 import SwiftRandom
 
