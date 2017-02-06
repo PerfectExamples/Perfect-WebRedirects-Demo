@@ -1,4 +1,4 @@
-# PerfectTemplate [简体中文](README.zh_CN.md)
+# Perfect WebRedirects Demo
 
 <p align="center">
     <a href="http://perfect.org/get-involved.html" target="_blank">
@@ -39,9 +39,43 @@
     </a>
 </p>
 
-Perfect Empty Starter Project
+Perfect Web Redirects Demo
 
-This repository holds a blank Perfect project which can be cloned to serve as a starter for new work. It builds with Swift Package Manager and produces a stand-alone HTTP executable.
+This demo shows the usage, and working of the [Perfect WebRedirects](https://github.com/PerfectlySoft/Perfect-WebRedirects) module.
+
+The Perfect WebRedirects module will filter for specified routes (including trailing wildcard routes) and perform redirects as instructed if a match is found.
+
+## Configuration file
+
+The configuration for these routes is included in a JSON file at `/config/redirect-rules/config.json` in the form:
+
+```
+{
+
+  "/test/no": {
+	"code": 302,
+	"destination": "/test/yes"
+  },
+
+	"/test/no301": {
+		"code": 301,
+		"destination": "/test/yes"
+  },
+  
+	"/test/wild/*": {
+		"code": 302,
+		"destination": "/test/wildyes"
+  },
+
+	"/test/wilder/*": {
+		"code": 302,
+		"destination": "/test/wilding/*"
+  }
+
+}
+```
+
+Note that multiple JSON files can exist in this directory - all will be loaded the first time the filter is invoked.
 
 ## Compatibility with Swift
 
@@ -49,7 +83,7 @@ The master branch of this project currently compiles with **Xcode 8.2** or the *
 
 ## Building & Running
 
-The following will clone and build an empty starter project and launch the server on port 8080 and 8181.
+The following will clone and build an empty starter project and launch the server on port 8181.
 
 ```
 git clone https://github.com/PerfectlySoft/PerfectTemplate.git

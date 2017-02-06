@@ -1,15 +1,15 @@
 //
 //  main.swift
-//  PerfectTemplate
+//  Perfect WebRedirects Demo
 //
-//  Created by Kyle Jessup on 2015-11-05.
+//  Created by Jonathan Guthrie on 2017-02-06.
 //	Copyright (C) 2015 PerfectlySoft, Inc.
 //
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the Perfect.org open source project
 //
-// Copyright (c) 2015 - 2016 PerfectlySoft Inc. and the Perfect project authors
+// Copyright (c) 2015 - 2017 PerfectlySoft Inc. and the Perfect project authors
 // Licensed under Apache License v2.0
 //
 // See http://perfect.org/licensing.html for license information
@@ -20,58 +20,65 @@
 import PerfectLib
 import PerfectHTTP
 import PerfectHTTPServer
+import Perfect_WebRedirects
+import PerfectRequestLogger
+import SwiftRandom
 
-// An example request handler.
-// This 'handler' function can be referenced directly in the configuration below.
+RequestLogFile.location = "./log.log"
+let r = URandom()
+
+// This 'handler' is executed for all requests specified.
 func handler(data: [String:Any]) throws -> RequestHandler {
 	return {
 		request, response in
 		// Respond with a simple message.
 		response.setHeader(.contentType, value: "text/html")
-		response.appendBody(string: "<html><title>Hello, world!</title><body>Hello, world!</body></html>")
+
+		let rand = r.secureToken
+
+		var str = "<h1>Perfect Redirects Demo</h1>"
+		str += "<p>Current path: \(request.path)</p>"
+		str += "<p><a href=\"/test/no\">/test/no (302) to /test/yes</a></p>"
+		str += "<p><a href=\"/test/no301\">/test/no (301) to /test/yes</a></p>"
+		str += "<p><a href=\"/test/wild/\(rand)\">/test/wild/* {\(rand)}(302) to /test/wildyes</a></p>"
+		str += "<p><a href=\"/test/wilder/\(rand)\">/test/wilder/* {\(rand)} (302) to /test/wilding/*</a></p>"
+		response.appendBody(string: "<html><title>Hello, world!</title><body>\(str)</body></html>")
 		// Ensure that response.completed() is called when your processing is done.
 		response.completed()
 	}
 }
 
-// Configuration data for two example servers.
-// This example configuration shows how to launch one or more servers 
-// using a configuration dictionary.
-
-let port1 = 8080, port2 = 8181
 
 let confData = [
 	"servers": [
-		// Configuration data for one server which:
-		//	* Serves the hello world message at <host>:<port>/
-		//	* Serves static files out of the "./webroot"
-		//		directory (which must be located in the current working directory).
-		//	* Performs content compression on outgoing data when appropriate.
 		[
 			"name":"localhost",
-			"port":port1,
+			"port":8181,
 			"routes":[
 				["method":"get", "uri":"/", "handler":handler],
-				["method":"get", "uri":"/**", "handler":PerfectHTTPServer.HTTPHandler.staticFiles,
-				 "documentRoot":"./webroot",
-				 "allowResponseFilters":true]
+				["method":"get", "uri":"/test/**", "handler":handler],
 			],
 			"filters":[
 				[
-				"type":"response",
-				"priority":"high",
-				"name":PerfectHTTPServer.HTTPFilter.contentCompression,
-				]
-			]
-		],
-		// Configuration data for another server which:
-		//	* Redirects all traffic back to the first server.
-		[
-			"name":"localhost",
-			"port":port2,
-			"routes":[
-				["method":"get", "uri":"/**", "handler":PerfectHTTPServer.HTTPHandler.redirect,
-				 "base":"http://localhost:\(port1)"]
+					"type":"request",
+					"priority":"high",
+					"name":RequestLogger.filterAPIRequest,
+					],
+				[
+					"type":"request",
+					"priority":"high",
+					"name":WebRedirectsFilter.filterAPIRequest,
+					],
+				[
+					"type":"response",
+					"priority":"high",
+					"name":PerfectHTTPServer.HTTPFilter.contentCompression,
+					],
+				[
+					"type":"response",
+					"priority":"low",
+					"name":RequestLogger.filterAPIResponse,
+					]
 			]
 		]
 	]
