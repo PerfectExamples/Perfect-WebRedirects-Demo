@@ -5,8 +5,8 @@ let package = Package(
     name: "Perfect-WebRedirectsDemo",
     targets: [],
     dependencies: [
-        .Package(url: "https://github.com/PerfectlySoft/Perfect-HTTPServer.git", majorVersion: 2),
-        .Package(url: "https://github.com/PerfectlySoft/Perfect-WebRedirects", majorVersion: 1),
-        .Package(url: "https://github.com/PerfectlySoft/Perfect-RequestLogger.git", majorVersion: 1),
+        .Package(url: "https://github.com/PerfectlySoft/Perfect-HTTPServer.git", majorVersion: 3),
+        .Package(url: "https://github.com/PerfectlySoft/Perfect-WebRedirects", majorVersion: 3),
+        .Package(url: "https://github.com/PerfectlySoft/Perfect-RequestLogger.git", majorVersion: 3),
     ]
 )
